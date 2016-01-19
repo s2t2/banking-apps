@@ -5,7 +5,8 @@ CREDS = {
   :username => ENV['BANK_OF_AMERICA_USERNAME'],
   :password => ENV['BANK_OF_AMERICA_PASSWORD'],
   :challenge_sibling => ENV["BANK_OF_AMERICA_CHALLENGE_SIBLING"],
-  :challenge_pet => ENV["BANK_OF_AMERICA_CHALLENGE_PET"]
+  :challenge_pet => ENV["BANK_OF_AMERICA_CHALLENGE_PET"],
+  :challenge_employer => ENV["BANK_OF_AMERICA_CHALLENGE_EMPLOYER"]
 }
 
 CREDS.each do |k,v|
@@ -15,7 +16,7 @@ end
 SESSION_ID = "#{Time.new.strftime("%Y%m%d%H%M%S")}-#{rand(10**10)}"
 
 def session_path
-  File.join("sessions", SESSION_ID)
+  File.join("bankofamerica","sessions", SESSION_ID)
 end
 
 def print_page(session, name)
@@ -60,14 +61,14 @@ if session.has_content?("What is your oldest sibling's middle name?")
   session.fill_in("tlpvt-challenge-answer", :with => CREDS[:challenge_sibling])
 elsif session.has_content?("What was the name of your first pet?")
   session.fill_in("tlpvt-challenge-answer", :with => CREDS[:challenge_pet])
+elsif session.has_content?("What is the name of your first employer?")
+  session.fill_in("tlpvt-challenge-answer", :with => CREDS[:challenge_employer])
 else
   puts "UNRECOGNIZED CHALLENGE QUESTION"
   binding.pry
-ensure
-  session.choose("no-recognize")
-  session.click_link("verify-cq-submit")
 end
-
+session.choose("no-recognize") if session.has_content?("no-recognize")
+session.click_link("verify-cq-submit")
 
 #
 # Get Accounts
@@ -75,11 +76,44 @@ end
 
 print_page(session, "3-accounts")
 
-# click on an Account link
+account_links = session.find_all(".AccountName")
+account_links.each do |account_link|
+  name = account_link.text.split(" - ").first
+  last_four = account_link.text.split(" - ").last
 
-# click "Download"
-# ... then loop through each Transaction Period, starting with the first/earliest
-# ... then choose "Microsoft Excel format"
-# ... then click "Download Transactions"
+  #
+  # Click on an Account
+  #
 
-# locate ~/Downloads/stmt.csv and mv ~/Downloads/stmt.csv ~/Desktop/banking-apps/bofa_transactions_20150206.csv
+  session.click_link(account_link.text)
+
+  print_page(session, "4-account-#{name}-#{last_four}")
+
+  #
+  # click "Download"
+  #
+  # ... then loop through each Transaction Period, starting with the first/earliest
+  # ... then choose "Microsoft Excel format"
+  # ... then click "Download Transactions"
+  # locate ~/Downloads/stmt.csv and mv ~/Downloads/stmt.csv ~/Desktop/banking-apps/bofa_transactions_20150206.csv
+
+  expand_download_options_link = session.find(:css, ".export-trans-view.download-upper")
+  expand_download_options_link.click
+
+  print_page(session, "4-account-#{name}-#{last_four}-download-options")
+
+  #transaction_period_selector = session.find("#select_txnperiod")
+  #transaction_periods = transaction_period_selector.all("option")
+  #transaction_periods.each do |transaction_period|
+    #period_name = transaction_period.text
+    #session.select(period_name, :from => 'Transaction period')
+
+    session.select("Current transactions", :from => 'Transaction period')
+    session.select("Microsoft Excel Format", :from => 'select_filetype')
+    download_button = session.find(:css, ".btn-bofa.btn-bofa-blue.btn-bofa-small.submit-download.btn-bofa-noRight")
+    download_button.click
+
+    #raise "NO TRANSACTIONS FOR PERIOD" if session.has_content?("The time period you have requested to download has no posted transactions. Please select a new date range.")
+
+  #end
+end
