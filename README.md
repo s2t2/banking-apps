@@ -13,7 +13,7 @@ brew install phantomjs
 ## Installation
 
 ```` sh
-git clone _________
+git clone git@github.com:s2t2/banking-apps.git
 cd banking-apps/
 ````
 
