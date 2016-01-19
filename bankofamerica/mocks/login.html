@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Example Bank of America Login Page</title>
+  </head>
+  <body>
+
+    <div class="login-container" id="top-container">
+      <div class="login-inputs">
+          <div class="id-text show-for-id-text ">
+              <form id="idForm" name="idForm" autocomplete="OFF">
+                <input type="text" value="" class="signin-text-box" id="onlineId1" name="onlineId1" placeholder="Online ID" maxlength="32" />
+              </form>
+          </div>
+          <label class="ada-hidden" for="passcode1">Password<span id="passcodeLabel1HasSavedID" class="hide"> for Online ID <span id="passcodeLabel1ID"></span></label>
+          <input type="password" value="" class="signin-text-box" id="passcode1" name="passcode1" placeholder="Passcode" maxlength="20" />
+
+          <button type="submit" id="hp-sign-in-btn" class="hp-sign-in-btn btn-bofa btn-bofa-small btn-bofa-noRight btn-bofa-blue" data-cm='["homepage_sign_in", "homepage:Content;home_personal"]'><span class="lock" aria-hidden="true"></span>Sign In</button>
+          <div class="clearboth"></div>
+      </div>
+    </div>
+    <div class="save-id-container">
+      <div class="save-id-checkbox show-for-id-text ">
+        <div class="save-id-label">
+          <input type="checkbox" id="saveMyID1" name="saveMyID1" value="Y"/>
+          <label for="saveMyID1">Save Online ID</label>
+        </div>
+      </div>
+      <div class="security-link">
+        <a rel="hpSecurityHelpLinkContent" class="boa-action boa-com-task-layer-link boa-com-task-layer-right boa-com-task-layer-width-520" href="javascript:void(0);" id="security_help_link">Security & Help</a>
+      </div>
+      <div class="clearboth"></div>
+    </div>
+
+  </body>
+</html>
